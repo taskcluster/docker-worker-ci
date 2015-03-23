@@ -1,0 +1,31 @@
+{
+  "name": "docker-worker-ci",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node -r bin/web.js $PROFILE",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gregarndt/docker-worker-ci.git"
+  },
+  "author": "Greg Arndt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gregarndt/docker-worker-ci/issues"
+  },
+  "homepage": "https://github.com/gregarndt/docker-worker-ci",
+  "dependencies": {
+    "debug": "^2.1.2",
+    "denodeify": "^1.2.1",
+    "github": "^0.2.3",
+    "hapi": "^8.2.0",
+    "json-templater": "^1.0.1",
+    "lodash": "^3.5.0",
+    "slugid": "^1.0.3",
+    "taskcluster-client": "^0.21.1",
+    "taskcluster-task-factory": "^0.6.4"
+  }
+}
