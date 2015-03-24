@@ -5,6 +5,7 @@ import GraphFactory from 'taskcluster-task-factory/graph';
 import jsTemplate from 'json-templater/object';
 import slugid from 'slugid';
 import { getContent } from '../lib/github';
+import { encryptEnvVariables } from '../lib/encrypt_env_variables';
 import { DEFAULT_TASK } from '../config/default_task';
 
 let debug = Debug('docker-worker-ci:handler:push');
@@ -89,14 +90,22 @@ export default async function(runtime, pushEvent, reply) {
 
   graph = GraphFactory.create(jsTemplate(graph, params));
 
-  graph.tasks = graph.tasks.map(function(task) {
-    task.taskId = slugid.v4();
+  let createdTasks = [];
+  let credentials = {
+    'TASKCLUSTER_ACCESS_TOKEN': runtime.config.taskcluster.accessToken,
+    'TASKCLUSTER_CLIENT_ID': runtime.config.taskcluster.clientId,
+    'PULSE_USERNAME': runtime.config.pulse.username,
+    'PULSE_PASSWORD': runtime.config.pulse.password
+  };
+  graph.tasks = await Promise.all(graph.tasks.map(async (task) => {
+    let taskId = slugid.v4();
+    task.taskId = taskId;
+    createdTasks.push(taskId);
+    task.task.payload['encryptedEnv'] = await encryptEnvVariables(
+      task, credentials, runtime.config.publicKeyUrl
+    );
     return task;
-  });
-
-  let createdTasks = graph.tasks.map((task) => {
-    return task.taskId;
-  });
+  }));
 
   let graphId = slugid.v4();
   debug('create graph', {
