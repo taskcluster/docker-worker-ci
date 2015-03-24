@@ -1,5 +1,7 @@
 export const config = {
-  githubSecret: process.env.GITHUB_SECRET,
+  github: {
+    accessToken: process.env.GITHUB_ACCESS_TOKEN
+  },
   port: process.env.PORT || 8800,
   taskGraphPath: 'taskgraph.json',
   taskcluster: {
@@ -7,4 +9,3 @@ export const config = {
     accessToken: process.env.TASKCLUSTER_ACCESS_TOKEN
   },
 };
-

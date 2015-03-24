@@ -4,61 +4,16 @@ import _ from 'lodash';
 import GraphFactory from 'taskcluster-task-factory/graph';
 import jsTemplate from 'json-templater/object';
 import slugid from 'slugid';
+import { getContent } from '../lib/github';
+import { DEFAULT_TASK } from '../config/default_task';
 
 let debug = Debug('docker-worker-ci:handler:push');
 
-const TASKGRAPH_PATH = 'taskgraph_push.json';
 const FAKE_DOMAIN = 'github.taskcluster.net';
 const GITHUB_CONTENT_URL = 'https://raw.githubusercontent.com';
 
-function getDefaultTask() {
-  return {
-    provisionerId: 'aws-provisioner',
-    retries: 1,
-    extra: {
-      github: {
-        baseUser: '{{githubBaseUser}}',
-        baseRepo: '{{githubBaseRepo}}',
-        baseRevision: '{{githubBaseRevision}}',
-        baseBranch: '{{githubBaseBranch}}',
-
-        headUser: '{{githubHeadUser}}',
-        headRepo: '{{githubHeadRepo}}',
-        headRevision: '{{githubBaseRevision}}}',
-        headBranch: '{{githubHeadBranch}}',
-      }
-    },
-    metadata: {},
-    payload: {
-      env: {
-        CI: true,
-        GITHUB_PULL_REQUEST: '0',
-
-        // Base details
-        GITHUB_BASE_REPO: '{{githubBaseRepo}}',
-        GITHUB_BASE_USER: '{{githubBaseUser}}',
-        GITHUB_BASE_GIT: 'https://github.com/{{githubBaseUser}}/{{githubBaseRepo}}',
-        GITHUB_BASE_REV: '{{githubBaseRevision}}',
-        GITHUB_BASE_BRANCH: '{{githubBaseBranch}}',
-
-        // Head details
-        GITHUB_HEAD_REPO: '{{githubHeadRepo}}',
-        GITHUB_HEAD_USER: '{{githubHeadUser}}',
-        GITHUB_HEAD_GIT: 'https://github.com/{{githubHeadUser}}/{{githubHeadRepo}}',
-        GITHUB_HEAD_REV: '{{githubHeadRevision}}',
-        GITHUB_HEAD_BRANCH: '{{githubHeadBranch}}',
-      },
-      maxRunTime: 7200,
-      features: {}
-    }
-  };
-}
-
 export default async function(runtime, pushEvent, reply) {
-  /*
-   * find taskgraph.json at the repo (repo.full_name)
-   * subsittute things for github repo, version, and tag "created for"
-   */
+  const TASKGRAPH_PATH = runtime.config.taskGraphPath;
   let repository = pushEvent.repository;
   let branch = pushEvent.ref.split('/').pop();
 
@@ -78,22 +33,13 @@ export default async function(runtime, pushEvent, reply) {
   let owner = `${pushEvent.pusher.name}@${FAKE_DOMAIN}`;
   let source = `${GITHUB_CONTENT_URL}/${username}/${repoName}/${branch}/${TASKGRAPH_PATH}`;
 
-  let fetchGraph = denodeify(runtime.github.repos.getContent.bind(runtime.github.repos));
-  let content = await fetchGraph({
-    user: username,
-    repo: repoName,
-    path: TASKGRAPH_PATH,
-    ref: branch
-  });
-
-  var buffer = new Buffer(content.content, 'base64');
-  let graph = buffer.toString();
+  let graph = await getContent(runtime, username, repoName, branch, TASKGRAPH_PATH);
   graph = JSON.parse(graph);
-
   debug(`Fetched graph`);
 
   let params = {
     // Base repository details...
+    githubPullRequestNumber: '0',
     githubBaseRepo: repository.name,
     githubBaseUser: repository.owner.name,
     githubBaseRevision: commit,
@@ -130,7 +76,7 @@ export default async function(runtime, pushEvent, reply) {
         }
       },
       task,
-      { task: getDefaultTask() }
+      { task: DEFAULT_TASK }
     );
 
     task.task.routes = task.task.routes || [];
