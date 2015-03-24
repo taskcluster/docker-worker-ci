@@ -4,7 +4,7 @@ checkout_path="$PWD/git_checkout"
 
 # Run the checkout to the correct url, etc...
 step_checkout() {
-  if [ "$GITHUB_PULL_REQUEST" == "1" ];
+  if [ "$GITHUB_PULL_REQUEST" -ne "0" ];
   then
     time git ci-checkout-pr \
       $checkout_path \
