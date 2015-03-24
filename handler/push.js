@@ -15,6 +15,7 @@ const GITHUB_CONTENT_URL = 'https://raw.githubusercontent.com';
 
 export default async function(runtime, pushEvent, reply) {
   const TASKGRAPH_PATH = runtime.config.taskGraphPath;
+  const BRANCHES = runtime.config.github.watchedBranches.split(',');
   let repository = pushEvent.repository;
   let branch = pushEvent.ref.split('/').pop();
 
@@ -26,6 +27,12 @@ export default async function(runtime, pushEvent, reply) {
   // commits with new data.x
   if (!pushEvent.commits || !pushEvent.commits.length) {
     return reply('No commits to take action on').code(200);
+  }
+
+  if (BRANCHES.indexOf(branch) === -1) {
+    // Return successful even though nothing could be done.  Nothing is wrong
+    // with the request, it's just not a configured branch
+    return reply('Unsupported branch').code(200);
   }
 
   let username = repository.owner.name;
