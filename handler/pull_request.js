@@ -11,11 +11,12 @@ let debug = Debug('docker-worker-ci:handler:pullRequest');
 const TASKGRAPH_INSPECTOR = 'http://docs.taskcluster.net/tools/task-graph-inspector';
 const FAKE_DOMAIN = 'github.taskcluster.net';
 const GITHUB_CONTENT_URL = 'https://raw.githubusercontent.com';
+const PULL_ACTIONS = ['opened', 'reopened'];
 
 export default async function(runtime, pullRequestEvent, reply) {
-  if (pullRequestEvent.action !== 'opened') {
+  if (PULL_ACTIONS.indexOf(pullRequestEvent.action) === -1) {
     // TODO use new cancel endpoint for closed/updated PR's
-    return reply('Pull Request action other than "opened"').code(200);
+    return reply('Pull Request action not supported.  No action taken.').code(200);
   }
 
   const TASKGRAPH_PATH = runtime.config.taskGraphPath;

@@ -1,6 +1,7 @@
 export const config = {
   github: {
-    accessToken: process.env.GITHUB_ACCESS_TOKEN
+    accessToken: process.env.GITHUB_ACCESS_TOKEN,
+    webhookSecret: process.env.GITHUB_WEBHOOK_SECRET
   },
   port: process.env.PORT || 80,
   taskGraphPath: 'taskgraph.json',
