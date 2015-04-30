@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN curl -SL "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" | \
     tar xz -C /usr/local --strip-components=1 && \
-    npm install -g npm@"$NPM_VERSION"
+    npm install -g npm@"$NPM_VERSION" && \
+    npm install -g babel@4.7.16
 
 RUN git config --global user.email "worker-ci@mozilla.com"
 RUN git config --global user.name "worker-ci"

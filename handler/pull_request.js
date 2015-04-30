@@ -49,11 +49,20 @@ export default async function(runtime, pullRequestEvent, reply) {
   let owner = `${pullRequest.user.login}@${FAKE_DOMAIN}`;
   let source = `${GITHUB_CONTENT_URL}/${pullRequest.head.repo.full_name}/` +
                `${pullRequest.head.ref}/${TASKGRAPH_PATH}`;
+
+  let scopes = [
+    'queue:create-task:aws-provisioner-v1/worker-ci-test',
+    'queue:define-task:aws-provisioner-v1/worker-ci-test'
+  ];
+
+  graph.tasks.forEach((task) => {
+    let scopes = task.task.scopes || [];
+    scopes.forEach(scopes.push);
+  });
+
   graph = _.merge(
     {
-      scopes: [
-        '*'
-      ],
+      scopes: scopes,
       metadata: {
         owner: owner,
         source: source

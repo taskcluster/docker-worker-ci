@@ -1,5 +1,5 @@
 export const DEFAULT_TASK = {
-    provisionerId: process.env['TASKCLUSER_PROVISIONER_ID'] || 'aws-provisioner',
+    provisionerId: process.env['TASKCLUSER_PROVISIONER_ID'] || 'aws-provisioner-v1',
     workerType: process.env['TASKCLUSTER_WORKER_TYPE'] || 'worker-ci-test',
     retries: 5,
     extra: {
