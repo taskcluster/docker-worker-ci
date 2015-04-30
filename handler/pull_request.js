@@ -12,7 +12,7 @@ let debug = Debug('docker-worker-ci:handler:pullRequest');
 const TASKGRAPH_INSPECTOR = 'http://docs.taskcluster.net/tools/task-graph-inspector';
 const FAKE_DOMAIN = 'github.taskcluster.net';
 const GITHUB_CONTENT_URL = 'https://raw.githubusercontent.com';
-const PULL_ACTIONS = ['opened', 'reopened'];
+const PULL_ACTIONS = ['opened', 'reopened', 'synchronize'];
 
 export default async function(runtime, pullRequestEvent, reply) {
   if (PULL_ACTIONS.indexOf(pullRequestEvent.action) === -1) {
