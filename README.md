@@ -37,11 +37,3 @@ Docker-worker CI can be started by running
 ```
 babel-node -r ./bin/web.js [localhost|production]
 ```
-
-## Docker image
-
-Docker-worker tests are run within a docker container that contains its own docker
-daemon so it can create and manage containers used for tests.  These containers can only
-be run within an environment that allows the docker container to run in privileged mode.
-
-Docker image can be found under `docker/`
