@@ -9,7 +9,7 @@ import { encryptEnvVariables } from '../lib/encrypt_env_variables';
 
 let debug = Debug('docker-worker-ci:handler:pullRequest');
 
-const TASKGRAPH_INSPECTOR = 'http://docs.taskcluster.net/tools/task-graph-inspector';
+const TASKGRAPH_INSPECTOR = 'https://tools.taskcluster.net/task-graph-inspector';
 const FAKE_DOMAIN = 'github.taskcluster.net';
 const GITHUB_CONTENT_URL = 'https://raw.githubusercontent.com';
 const PULL_ACTIONS = ['opened', 'reopened', 'synchronize'];
